@@ -11,6 +11,19 @@ const criarTabelaUsuario = async () => {
 	return database.query(query);
 };
 
+/**
+ * Função para identificar se já existe algum email na hora de criar usuário.
+ */
+const localizarUsuario = async (email) => {
+	const query = `SELECT * FROM usuarios WHERE email = '${email}'`;
+	return database.query(query);
+};
+
+const localizarId = async (id) => {
+	const query = `SELECT * FROM usuarios WHERE id = '${id}'`;
+	return database.query(query);
+};
+
 const adicionarUsuarioNaTabela = async (email, senha, nome) => {
 	const query = {
 		text: `INSERT INTO usuarios (email, senha, nome)
@@ -19,4 +32,9 @@ const adicionarUsuarioNaTabela = async (email, senha, nome) => {
 	};
 	return database.query(query);
 };
-module.exports = { criarTabelaUsuario, adicionarUsuarioNaTabela };
+module.exports = {
+	criarTabelaUsuario,
+	adicionarUsuarioNaTabela,
+	localizarUsuario,
+	localizarId,
+};
