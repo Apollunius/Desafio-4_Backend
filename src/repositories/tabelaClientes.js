@@ -17,7 +17,26 @@ const adicionarClienteNaTabela = async (nome, cpf, email, tel, idUser) => {
 	return database.query(query);
 };
 
+const atualizarCliente = async (id, nome, cpf, email, tel) => {
+	const query = `UPDATE clientes SET nome = '${nome}', cpf = '${cpf}', email = '${email}', tel = '${tel}' 
+		WHERE id = ${id} RETURNING *`;
+	return database.query(query);
+};
+
+const listarClientes = async (offset) => {
+	const query = `SELECT * FROM clientes LIMIT 10 OFFSET ${offset}`;
+	return database.query(query);
+};
+
+const listarClientesPorBusca = async (string, offset) => {
+	const query = `SELECT * FROM clientes WHERE (nome LIKE '%${string}%' OR email = '${string}' OR cpf = '${string}') LIMIT 10 OFFSET ${offset}`;
+	return database.query(query);
+};
+
 module.exports = {
 	adicionarClienteNaTabela,
 	localizarCPF,
+	atualizarCliente,
+	listarClientes,
+	listarClientesPorBusca,
 };
