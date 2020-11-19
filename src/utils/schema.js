@@ -27,6 +27,9 @@ const schema = {
 	)`,
 };
 
+/**
+ * Essa função dropa a tabela que estiver como argumento
+ */
 const drop = async (nomeTabela) => {
 	if (nomeTabela) {
 		await database.query(`DROP TABLE ${nomeTabela}`);
@@ -34,9 +37,9 @@ const drop = async (nomeTabela) => {
 	}
 };
 /**
- * Função que define qual query existente em schema, com o numero respectivo
- * eu vou rodar. Se eu não passar um número, então todas as queries de schema
- * uma a uma serão rodadas.
+ * Função que define a criação de tabela,
+ * seja individual (pelo numero do schema no argumento da função)
+ * como todas de vez(sem colocar nenhum argumento na função.)
  */
 const up = async (numeroSchema = null) => {
 	if (!numeroSchema) {
