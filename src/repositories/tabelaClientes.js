@@ -1,18 +1,5 @@
 const database = require('../utils/database');
 
-const criarTabelaClientes = async () => {
-	const query = `CREATE TABLE IF NOT EXISTS clientes (
-		id SERIAL,
-		nome TEXT,
-		cpf VARCHAR(14),
-		email VARCHAR(50),
-		tel VARCHAR(14),
-		idUser TEXT
-	)`;
-
-	return database.query(query);
-};
-
 /**
  * Função para localizar o cliente pelo CPF
  */
@@ -31,7 +18,6 @@ const adicionarClienteNaTabela = async (nome, cpf, email, tel, idUser) => {
 };
 
 module.exports = {
-	criarTabelaClientes,
 	adicionarClienteNaTabela,
 	localizarCPF,
 };

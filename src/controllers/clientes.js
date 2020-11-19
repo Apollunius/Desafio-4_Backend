@@ -4,8 +4,6 @@ const response = require('../utils/response');
 // const Password = require('../utils/password');
 
 const adicionarCliente = async (ctx) => {
-	TabelaClientes.criarTabelaClientes(); // cria a tabela de clientes se caso ainda não existir
-
 	const {
 		nome = null,
 		cpf = null,
@@ -17,18 +15,24 @@ const adicionarCliente = async (ctx) => {
 		return response(ctx, 400, { mensagem: 'Mal formatado' });
 	}
 	const resultDados = await TabelaClientes.localizarCPF(cpf);
-	console.log(resultDados);
-	const cpfCliente = resultDados.rows[0].cpf;
-	if (cpfCliente === cpf) {
-		return response(ctx, 401, {
-			mensagem: 'Esse cliente já está cadastrado.',
-		});
+	console.log(await resultDados.rows);
+	console.log((await resultDados.rows) !== []);
+	if (resultDados.rows.length > 0) {
+		console.log('passou aqui?');
+		const cpfCliente = resultDados.rows[0].cpf;
+		if (cpfCliente === cpf) {
+			return response(ctx, 401, {
+				mensagem: 'Esse cliente já está cadastrado.',
+			});
+		}
 	}
-
 	const resultDados2 = await TabelaUsuarios.localizarId(idUsuario);
-	const idUser = resultDados2.rows[0].id;
-	if (idUsuario !== idUser.toString()) {
-		return response(ctx, 400, { mensagem: 'Mal formatado' });
+	if (resultDados2.rows.length > 0) {
+		const idUser = resultDados2.rows[0].id;
+		console.log(idUser);
+		if (idUsuario !== idUser) {
+			return response(ctx, 400, { mensagem: 'Mal formatado' });
+		}
 	}
 	const result = await TabelaClientes.adicionarClienteNaTabela(
 		nome,

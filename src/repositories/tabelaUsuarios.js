@@ -1,16 +1,5 @@
 const database = require('../utils/database');
 
-const criarTabelaUsuario = async () => {
-	const query = `CREATE TABLE IF NOT EXISTS usuarios (
-		id SERIAL,
-		email VARCHAR(50),
-		senha TEXT,
-		nome TEXT
-	)`;
-
-	return database.query(query);
-};
-
 /**
  * Função para identificar se já existe algum email na hora de criar usuário.
  */
@@ -33,7 +22,6 @@ const adicionarUsuarioNaTabela = async (email, senha, nome) => {
 	return database.query(query);
 };
 module.exports = {
-	criarTabelaUsuario,
 	adicionarUsuarioNaTabela,
 	localizarUsuario,
 	localizarId,
