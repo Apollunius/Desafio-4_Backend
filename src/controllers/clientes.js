@@ -58,6 +58,7 @@ const atualizarCliente = async (ctx) => {
 		if (id !== idUser.toString()) {
 			return response(ctx, 400, { mensagem: 'Mal formatado' });
 		}
+	}
 	const result = await TabelaClientes.atualizarCliente(
 		id,
 		nome,
