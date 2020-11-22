@@ -1,7 +1,8 @@
-const tabelaClientes = require('../repositories/tabelaClientes');
 const TabelaClientes = require('../repositories/tabelaClientes');
 const TabelaUsuarios = require('../repositories/tabelaUsuarios');
+const Codigo = require('../utils/code');
 const response = require('../utils/response');
+
 
 const adicionarCliente = async (ctx) => {
 	const {
@@ -14,25 +15,26 @@ const adicionarCliente = async (ctx) => {
 	if (!nome || !cpf || !email || !tel || !idUsuario) {
 		return response(ctx, 400, { mensagem: 'Mal formatado' });
 	}
-	const resultDados = await TabelaClientes.localizarCPF(cpf);
-	if (resultDados.rows.length > 0) {
-		const cpfCliente = resultDados.rows[0].cpf;
+	const verificarCliente = await TabelaClientes.localizarCPF(cpf);
+	if (verificarCliente.rows.length > 0) {
+		const cpfCliente = verificarCliente.rows[0].cpf;
 		if (cpfCliente === cpf) {
 			return response(ctx, 401, {
 				mensagem: 'Esse cliente já está cadastrado.',
 			});
 		}
 	}
-	const resultDados2 = await TabelaUsuarios.localizarId(idUsuario);
+	const resultDados2 = await TabelaUsuarios.localizarId(idUsuario); // Função para testes iniciais, será removido após a montagem do front
 	if (resultDados2.rows.length > 0) {
 		const idUser = resultDados2.rows[0].id;
 		if (idUsuario !== idUser.toString()) {
 			return response(ctx, 400, { mensagem: 'Mal formatado' });
 		}
 	}
+	const cpfLimpo = Codigo.limparCpf(cpf)
 	const result = await TabelaClientes.adicionarClienteNaTabela(
 		nome,
-		cpf,
+		cpfLimpo,
 		email,
 		tel,
 		idUsuario
@@ -52,21 +54,20 @@ const atualizarCliente = async (ctx) => {
 	if (!nome || !cpf || !email || !tel || !id) {
 		return response(ctx, 400, { mensagem: 'Mal formatado' });
 	}
-	const resultDados2 = await tabelaClientes.localizarIdClientes(id);
-	if (resultDados2.rows.length > 0) {
-		const idUser = resultDados2.rows[0].id;
-		if (id !== idUser.toString()) {
-			return response(ctx, 400, { mensagem: 'Mal formatado' });
-		}
+	const verificarCliente = await TabelaClientes.localizarIdClientes(id);
+	if (verificarCliente.rows.length == 0) {
+		return response(ctx, 400, { mensagem: 'Mal formatado' }); 
 	}
+	const cpfLimpo = Codigo.limparCpf(cpf)
 	const result = await TabelaClientes.atualizarCliente(
 		id,
 		nome,
-		cpf,
+		cpfLimpo,
 		email,
 		tel
 	);
-	return response(ctx, 200, result.rows);
+	const cpfEditado = Codigo.montarCpf(result[0].cpf);
+	return response(ctx, 200, {id: result[0].id, nome: result[0].nome, cpf: cpfEditado, email: result[0].email, tel: result[0].tel});
 };
 const querystring = async (ctx) => {
 	const { offset } = ctx.query;
