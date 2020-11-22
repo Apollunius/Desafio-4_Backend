@@ -8,6 +8,9 @@ const localizarUsuario = async (email) => {
 	return database.query(query);
 };
 
+/**
+ * Função para identificar se já existe usuário com o id específico para criar o usuário.
+ */
 const localizarId = async (id) => {
 	const query = `SELECT * FROM usuarios WHERE id = '${id}'`;
 	return database.query(query);
@@ -21,6 +24,7 @@ const adicionarUsuarioNaTabela = async (email, senha, nome) => {
 	};
 	return database.query(query);
 };
+
 module.exports = {
 	adicionarUsuarioNaTabela,
 	localizarUsuario,

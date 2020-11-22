@@ -8,6 +8,11 @@ const localizarCPF = async (cpf) => {
 	return database.query(query);
 };
 
+const localizarIdCliente = async (id) => {
+	const query = `SELECT * FROM clientes WHERE id = '${id}'`;
+	return database.query(query);
+};
+
 const adicionarClienteNaTabela = async (nome, cpf, email, tel, idUser) => {
 	const query = {
 		text: `INSERT INTO clientes (nome, cpf, email, tel, iduser)
@@ -36,6 +41,7 @@ const listarClientesPorBusca = async (string, offset) => {
 module.exports = {
 	adicionarClienteNaTabela,
 	localizarCPF,
+	localizarIdCliente,
 	atualizarCliente,
 	listarClientes,
 	listarClientesPorBusca,

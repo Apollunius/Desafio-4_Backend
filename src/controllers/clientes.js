@@ -1,3 +1,4 @@
+const tabelaClientes = require('../repositories/tabelaClientes');
 const TabelaClientes = require('../repositories/tabelaClientes');
 const TabelaUsuarios = require('../repositories/tabelaUsuarios');
 const response = require('../utils/response');
@@ -51,6 +52,12 @@ const atualizarCliente = async (ctx) => {
 	if (!nome || !cpf || !email || !tel || !id) {
 		return response(ctx, 400, { mensagem: 'Mal formatado' });
 	}
+	const resultDados2 = await tabelaClientes.localizarIdClientes(id);
+	if (resultDados2.rows.length > 0) {
+		const idUser = resultDados2.rows[0].id;
+		if (id !== idUser.toString()) {
+			return response(ctx, 400, { mensagem: 'Mal formatado' });
+		}
 	const result = await TabelaClientes.atualizarCliente(
 		id,
 		nome,
