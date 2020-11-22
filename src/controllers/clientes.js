@@ -3,7 +3,6 @@ const TabelaUsuarios = require('../repositories/tabelaUsuarios');
 const Codigo = require('../utils/code');
 const response = require('../utils/response');
 
-
 const adicionarCliente = async (ctx) => {
 	const {
 		nome = null,
@@ -31,7 +30,7 @@ const adicionarCliente = async (ctx) => {
 			return response(ctx, 400, { mensagem: 'Mal formatado' });
 		}
 	}
-	const cpfLimpo = Codigo.limparCpf(cpf)
+	const cpfLimpo = Codigo.limparCpf(cpf);
 	const result = await TabelaClientes.adicionarClienteNaTabela(
 		nome,
 		cpfLimpo,
@@ -55,10 +54,10 @@ const atualizarCliente = async (ctx) => {
 		return response(ctx, 400, { mensagem: 'Mal formatado' });
 	}
 	const verificarCliente = await TabelaClientes.localizarIdClientes(id);
-	if (verificarCliente.rows.length == 0) {
-		return response(ctx, 400, { mensagem: 'Mal formatado' }); 
+	if (verificarCliente.rows.length === 0) {
+		return response(ctx, 400, { mensagem: 'Mal formatado' });
 	}
-	const cpfLimpo = Codigo.limparCpf(cpf)
+	const cpfLimpo = Codigo.limparCpf(cpf);
 	const result = await TabelaClientes.atualizarCliente(
 		id,
 		nome,
@@ -67,7 +66,13 @@ const atualizarCliente = async (ctx) => {
 		tel
 	);
 	const cpfEditado = Codigo.montarCpf(result[0].cpf);
-	return response(ctx, 200, {id: result[0].id, nome: result[0].nome, cpf: cpfEditado, email: result[0].email, tel: result[0].tel});
+	return response(ctx, 200, {
+		id: result[0].id,
+		nome: result[0].nome,
+		cpf: cpfEditado,
+		email: result[0].email,
+		tel: result[0].tel,
+	});
 };
 const querystring = async (ctx) => {
 	const { offset } = ctx.query;

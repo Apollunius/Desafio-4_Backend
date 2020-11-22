@@ -1,21 +1,41 @@
-const axios = require('axios');
+const axios = require('axios').default;
+
 require('dotenv').config();
 
-pagarme.client.connect({ api_key: process.env.PAGARME_KEY }).then((client) =>
-	client.transactions.create({
-		amount: 1000,
-		payment_method: 'boleto',
-		postback_url: 'http://requestb.in/pkt7pgpk',
-		customer: {
-			type: 'individual',
-			country: 'br',
-			name: 'Aardvark Silva',
-			documents: [
-				{
-					type: 'cpf',
-					number: '00000000000',
+const pay = async (amount, descricao, vencimento, nome, cpf) => {
+	try {
+		const transaction = await axios.post(
+			'https://api.pagar.me/1/transactions',
+			{
+				amount,
+				boleto_instructions: descricao,
+				boleto_expiration_date: vencimento,
+				customer: {
+					type: 'individual',
+					country: 'br',
+					name: nome,
+					documents: [
+						{
+							type: 'cpf',
+							number: cpf,
+						},
+					],
 				},
-			],
-		},
-	})
-);
+
+				payment_method: 'boleto',
+				api_key: process.env.PAGARME_KEY,
+			}
+		);
+		return transaction.data;
+	} catch (err) {
+		console.log(err.response.data);
+		return {
+			status: 'error',
+			data: {
+				mensagem: 'Erro no Pagamento',
+			},
+		};
+	}
+};
+
+module.exports = { pay };
