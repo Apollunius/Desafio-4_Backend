@@ -14,8 +14,9 @@ const verify = async (ctx, next) => {
 	try {
 		const verification = await jwt.verify(token, process.env.JWT_SECRET);
 		ctx.state.email = verification.email;
-		ctx.state.idUsuario = verification.id;
+		ctx.state.idUsuario = verification.idUsuario;
 		ctx.state.nome = verification.nome;
+
 	} catch (err) {
 		return response(ctx, 403, { mensagem: 'Ação Proibida' });
 	}

@@ -22,7 +22,6 @@ const autenticar = async (ctx) => {
 				process.env.JWT_SECRET || 'cubosacademy',
 				{ expiresIn: '1h' }
 			);
-
 			return response(ctx, 200, {
 				mensagem: `Usuário logado com sucesso!`,
 				token: `${token}`,

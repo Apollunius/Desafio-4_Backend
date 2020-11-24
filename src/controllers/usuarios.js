@@ -11,6 +11,7 @@ const adicionarUsuario = async (ctx) => {
 
 	// verifica se o email solicitado já existe na tabela.
 	const resultDados = await TabelaUsuarios.localizarUsuario(email);
+	console.log(resultDados.rows)
 	if (resultDados.rows.length > 0) {
 		const emailUsuario = resultDados.rows[0].email;
 		if (emailUsuario === email) {

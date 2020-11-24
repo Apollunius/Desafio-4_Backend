@@ -13,6 +13,7 @@ const adicionarCliente = async (ctx) => {
 	
 	
 	if (!nome || !cpf || !email || !tel || !idUsuario) {
+		console.log(idUsuario)
 		return response(ctx, 400, { mensagem: 'Mal formatado' });
 	}
 	const verificarCliente = await TabelaClientes.localizarCPF(cpf);
