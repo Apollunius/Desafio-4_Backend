@@ -1,5 +1,4 @@
 const TabelaClientes = require('../repositories/tabelaClientes');
-const TabelaUsuarios = require('../repositories/tabelaUsuarios');
 const Codigo = require('../utils/code');
 const response = require('../utils/response');
 
@@ -9,8 +8,10 @@ const adicionarCliente = async (ctx) => {
 		cpf = null,
 		email = null,
 		tel = null,
-		idUsuario = null,
 	} = ctx.request.body;
+	const { idUsuario } = ctx.state;
+	
+	
 	if (!nome || !cpf || !email || !tel || !idUsuario) {
 		return response(ctx, 400, { mensagem: 'Mal formatado' });
 	}
@@ -21,13 +22,6 @@ const adicionarCliente = async (ctx) => {
 			return response(ctx, 401, {
 				mensagem: 'Esse cliente já está cadastrado.',
 			});
-		}
-	}
-	const resultDados2 = await TabelaUsuarios.localizarId(idUsuario); // Função para testes iniciais, será removido após a montagem do front
-	if (resultDados2.rows.length > 0) {
-		const idUser = resultDados2.rows[0].id;
-		if (idUsuario !== idUser.toString()) {
-			return response(ctx, 400, { mensagem: 'Mal formatado' });
 		}
 	}
 	const cpfLimpo = Codigo.limparCpf(cpf);
@@ -53,10 +47,11 @@ const atualizarCliente = async (ctx) => {
 	if (!nome || !cpf || !email || !tel || !id) {
 		return response(ctx, 400, { mensagem: 'Mal formatado' });
 	}
-	const verificarCliente = await TabelaClientes.localizarIdClientes(id);
+	const verificarCliente = await TabelaClientes.localizarIdCliente(id);
 	if (verificarCliente.rows.length === 0) {
 		return response(ctx, 400, { mensagem: 'Mal formatado' });
 	}
+
 	const cpfLimpo = Codigo.limparCpf(cpf);
 	const result = await TabelaClientes.atualizarCliente(
 		id,
@@ -65,13 +60,13 @@ const atualizarCliente = async (ctx) => {
 		email,
 		tel
 	);
-	const cpfEditado = Codigo.montarCpf(result[0].cpf);
+	const cpfEditado = Codigo.montarCpf(cpfLimpo);
 	return response(ctx, 200, {
-		id: result[0].id,
-		nome: result[0].nome,
+		id: result.rows[0].id,
+		nome: result.rows[0].nome,
 		cpf: cpfEditado,
-		email: result[0].email,
-		tel: result[0].tel,
+		email: result.rows[0].email,
+		tel: result.rows[0].tel,
 	});
 };
 const querystring = async (ctx) => {
