@@ -10,7 +10,7 @@ const payment = async (ctx) => {
 		valor,
 		vencimento,
 	} = ctx.request.body;
-	const result = await TabelaCliente.localizarIdCliente(idDoCliente);
+	const result = await TabelaCliente.localizarIdCliente(idClient);
 	const { nome, cpf } = result.rows[0];
 	if (valor >= 100) {
 		const transaction = await pagarme.pay(
@@ -22,9 +22,9 @@ const payment = async (ctx) => {
 		);
 		await TabelaPagamentos.adicionarBoletoNaTabela(
 			idClient,
+			descricao,
 			valor,
 			vencimento,
-			descricao,
 			transaction.boleto_url,
 		);
 		return response(ctx, 201, {

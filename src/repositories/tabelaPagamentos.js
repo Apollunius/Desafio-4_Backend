@@ -1,10 +1,10 @@
 const database = require('../utils/database');
 
-const adicionarBoletoNaTabela = async (idClient, valor, vencimento, descricao, link) => {
+const adicionarBoletoNaTabela = async (idClient, descricao, valor, vencimento, link) => {
 	const query = {
-		text: `INSERT INTO boletos (idClient, valor, vencimento, descricao, link)
+		text: `INSERT INTO boletos (idClient, descricao, valor, vencimento, link)
 	VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-		values: [idClient, valor, vencimento, descricao, link],
+		values: [idClient, descricao, valor, vencimento, link],
 	};
 	return database.query(query);
 };
