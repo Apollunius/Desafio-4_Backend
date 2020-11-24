@@ -1,12 +1,13 @@
 const pagarme = require('../utils/pagarme');
 const TabelaCliente = require('../repositories/tabelaClientes');
+const TabelaPagamentos = require('../repositories/tabelaPagamentos')
 const response = require('../utils/response');
 
 const payment = async (ctx) => {
 	const {
-		idDoCliente,
+		idClient,
 		descricao,
-		valor = 100,
+		valor,
 		vencimento,
 	} = ctx.request.body;
 	const result = await TabelaCliente.localizarIdCliente(idDoCliente);
@@ -19,19 +20,31 @@ const payment = async (ctx) => {
 			nome,
 			cpf
 		);
-
+		await TabelaPagamentos.adicionarBoletoNaTabela(
+			idClient,
+			valor,
+			vencimento,
+			descricao,
+			transaction.boleto_url,
+		);
 		return response(ctx, 201, {
 			cobranca: {
-				idDoCliente,
+				idClient,
 				descricao,
 				valor,
 				vencimento,
 				linkDoBoleto: transaction.boleto_url,
-				status: transaction.status,
+				status: "AGUARDANDO"
 			},
 		});
 	}
 	return response(ctx, 400, { mensagem: 'Mal formatado.' });
 };
 
-module.exports = { payment };
+const querystring = async (ctx) => {
+	const { offset, idClient } = ctx.query;
+	const result = await TabelaPagamentos.listarBoletos(offset, idClient);
+	return response(ctx, 200, { cobrancas: result.rows });
+};
+
+module.exports = { payment, querystring };

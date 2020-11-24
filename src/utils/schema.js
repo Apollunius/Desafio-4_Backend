@@ -18,12 +18,12 @@ const schema = {
 	)`,
 	3: `CREATE TABLE IF NOT EXISTS boletos (
 		id SERIAL PRIMARY KEY,
-		valor INT,
-		vencimento DATE,
-		cliente INT,
-		descricao TEXT,
-		link TEXT,
-		dataPagamento DATE
+		idClient INT NOT NULL,
+		descricao TEXT NOT NULL,
+		valor INT NOT NULL,
+		vencimento DATE NOT NULL,
+		link TEXT NOT NULL,
+		status TEXT NOT NULL DEFAULT 'AGUARDANDO'
 	)`,
 };
 

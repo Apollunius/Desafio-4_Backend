@@ -8,3 +8,4 @@ const montarCpf = (cpf) => {
 };
 
 module.exports = { limparCpf, montarCpf };
+
