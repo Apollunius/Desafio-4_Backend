@@ -25,7 +25,7 @@ const adicionarCliente = async (ctx) => {
 			});
 		}
 	}
-	const cpfLimpo = Codigo.limparCpf(cpf);
+	const cpfLimpo = Codigo.limparDado(cpf);
 	const result = await TabelaClientes.adicionarClienteNaTabela(
 		nome,
 		cpfLimpo,
@@ -53,21 +53,24 @@ const atualizarCliente = async (ctx) => {
 		return response(ctx, 400, { mensagem: 'Mal formatado' });
 	}
 
-	const cpfLimpo = Codigo.limparCpf(cpf);
+	const cpfLimpo = Codigo.limparDado(cpf);
+	const telefoneLimpo = Codigo.limparDado(tel);
+
 	const result = await TabelaClientes.atualizarCliente(
 		id,
-		nome,
+		nome.toLowerCase().trim(),
 		cpfLimpo,
-		email,
-		tel
+		email.toLowerCase().trim(),
+		telefoneLimpo
 	);
-	const cpfEditado = Codigo.montarCpf(cpfLimpo);
+	const cpfEditado = Codigo.organizarCpf(cpfLimpo);
+	const telefoneEditado = Codigo.organizarTelefone(telefoneLimpo);
 	return response(ctx, 200, {
 		id: result.rows[0].id,
 		nome: result.rows[0].nome,
 		cpf: cpfEditado,
 		email: result.rows[0].email,
-		tel: result.rows[0].tel,
+		tel: telefoneEditado,
 	});
 };
 const querystring = async (ctx) => {
