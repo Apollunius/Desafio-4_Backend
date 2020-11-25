@@ -10,11 +10,29 @@ const adicionarBoletoNaTabela = async (idClient, descricao, valor, vencimento, l
 };
 
 const listarBoletos = async (offset, idClient) => {
-	const query = `SELECT * FROM boletos WHERE idClient = ${idClient} LIMIT 10 OFFSET ${offset}`;
+	const query = `SELECT * FROM boletos WHERE idClient = '${idClient}' LIMIT 10 OFFSET ${offset}`;
 	return database.query(query);
 };
 
+const pagarBoleto = async (idCobranca) => {
+	const query = `UPDATE boletos SET status = 'PAGO' WHERE id = '${idCobranca}' RETURNING *`
+	return database.query(query);
+}
+const boletoVencido = async (idCobranca) => {
+	const query = `UPDATE boletos SET status = 'VENCIDO' WHERE id = '${idCobranca}' RETURNING *`
+	return database.query(query);
+}
+
+const buscarBoleto = async (idCobranca) => {
+	const query = `SELECT * FROM boletos WHERE id = '${idCobranca}'`;
+	return database.query(query);
+}
+
+
 module.exports = {
 	adicionarBoletoNaTabela,
-	listarBoletos
+	listarBoletos,
+	pagarBoleto,
+	buscarBoleto,
+	boletoVencido
 };

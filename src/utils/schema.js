@@ -14,7 +14,7 @@ const schema = {
 		cpf VARCHAR(14) NOT NULL,
 		email VARCHAR(50) NOT NULL,
 		tel VARCHAR(14) NOT NULL,
-		idUser INT NOT NULL
+		idUser INT NOT NULL,
 		estaInadimplente BOOL DEFAULT FALSE
 	)`,
 	3: `CREATE TABLE IF NOT EXISTS boletos (

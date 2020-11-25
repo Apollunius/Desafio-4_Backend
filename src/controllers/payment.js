@@ -3,7 +3,7 @@ const TabelaCliente = require('../repositories/tabelaClientes');
 const TabelaPagamentos = require('../repositories/tabelaPagamentos')
 const response = require('../utils/response');
 
-const payment = async (ctx) => {
+const criarBoleto = async (ctx) => {
 	const {
 		idClient,
 		descricao,
@@ -43,8 +43,41 @@ const payment = async (ctx) => {
 
 const querystring = async (ctx) => {
 	const { offset, idClient } = ctx.query;
-	const result = await TabelaPagamentos.listarBoletos(offset, idClient);
+
+	let result = await TabelaPagamentos.listarBoletos(offset, idClient);
+	result.rows.forEach(element => {
+		
+		if((Date.now() - element.vencimento.getTime()) > 0) {
+			TabelaPagamentos.boletoVencido(element.id);
+		}	
+	});
+	result = await TabelaPagamentos.listarBoletos(offset, idClient);
+	
 	return response(ctx, 200, { cobrancas: result.rows });
 };
 
-module.exports = { payment, querystring };
+const pagarBoleto = async (ctx) => {
+	const {id} = ctx.request.body;
+	const result = await TabelaPagamentos.buscarBoleto(id);
+	const status = result.rows[0].status;
+	const vencimento = result.rows[0].vencimento;
+	
+	if((Date.now() - vencimento.getTime()) <= 0){
+		if(status == "AGUARDANDO") {
+			const boletoPago = await TabelaPagamentos.pagarBoleto(id);
+			return response(ctx, 200, { mensagem: 'Cobrança paga com sucesso' });
+		} else {
+			return response(ctx, 400, { mensagem: 'Boleto já pago' });
+		}
+	} else {
+		const boletoVencido = await TabelaPagamentos.boletoVencido(id);
+		return response(ctx, 400, { mensagem: 'Boleto vencido' });
+	}
+}
+
+const relatorio = async (ctx) => {
+	
+}
+
+
+module.exports = { criarBoleto, querystring, pagarBoleto };
