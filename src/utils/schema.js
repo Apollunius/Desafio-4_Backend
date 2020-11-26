@@ -24,7 +24,8 @@ const schema = {
 		valor INT NOT NULL,
 		vencimento DATE NOT NULL,
 		link TEXT NOT NULL,
-		status TEXT NOT NULL DEFAULT 'AGUARDANDO'
+		status TEXT NOT NULL DEFAULT 'AGUARDANDO',
+		transactionId TEXT NOT NULL
 	)`,
 };
 

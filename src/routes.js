@@ -18,6 +18,6 @@ router.post('/cobrancas', Session.verify, Payment.criarBoleto); // criar cobran�
 router.get('/cobrancas', Session.verify, Payment.querystring); // listar cobranças (verificar a querystring)
 router.put('/cobrancas', Session.verify, Payment.pagarBoleto); // pagar cobrança
 
-// router.get('/relatorios', Session.verify); // obter relatório
+router.get('/relatorios', Session.verify, Payment.relatorio); // obter relatório
 
 module.exports = router;
