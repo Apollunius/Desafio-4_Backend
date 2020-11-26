@@ -8,8 +8,8 @@ const localizarCPF = async (cpf) => {
 	return database.query(query);
 };
 
-const localizarIdCliente = async (id) => {
-	const query = `SELECT * FROM clientes WHERE id = '${id}'`;
+const localizarIdCliente = async (id, idUser) => {
+	const query = `SELECT * FROM clientes WHERE (id = '${id}' AND idUser = '${idUser}')`;
 	return database.query(query);
 };
 
@@ -22,19 +22,19 @@ const adicionarClienteNaTabela = async (nome, cpf, email, tel, idUser) => {
 	return database.query(query);
 };
 
-const atualizarCliente = async (id, nome, cpf, email, tel) => {
+const atualizarCliente = async (id, nome, cpf, email, tel, idUser) => {
 	const query = `UPDATE clientes SET nome = '${nome}', cpf = '${cpf}', email = '${email}', tel = '${tel}' 
-		WHERE id = ${id} RETURNING *`;
+		WHERE (id = '${id}' AND idUser = '${idUser}') RETURNING *`;
 	return database.query(query);
 };
 
-const listarClientes = async (offset) => {
-	const query = `SELECT * FROM clientes LIMIT 10 OFFSET ${offset}`;
+const listarClientes = async (offset, idUser) => {
+	const query = `SELECT * FROM clientes WHERE idUser = '${idUser}' LIMIT 10 OFFSET ${offset}`;
 	return database.query(query);
 };
 
-const listarClientesPorBusca = async (string, offset) => {
-	const query = `SELECT * FROM clientes WHERE (nome LIKE '%${string}%' OR email = '${string}' OR cpf = '${string}') LIMIT 10 OFFSET ${offset}`;
+const listarClientesPorBusca = async (string, offset, idUser) => {
+	const query = `SELECT * FROM clientes WHERE ((nome LIKE '%${string}%' OR email = '${string}' OR cpf = '${string}') AND idUser = ${idUser}) LIMIT 10 OFFSET ${offset}`;
 	return database.query(query);
 };
 

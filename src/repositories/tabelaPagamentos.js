@@ -29,7 +29,7 @@ const buscarBoleto = async (idCobranca) => {
 }
 
 const buscarTodosOsBoletos = async () => {
-	const query = `SELECT * FROM boletos'`;
+	const query = `SELECT * FROM boletos`;
 	return database.query(query);
 }
 const relatorio = async (idUser) => {

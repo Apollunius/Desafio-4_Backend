@@ -2,7 +2,7 @@ const axios = require('axios').default;
 
 require('dotenv').config();
 
-const pay = async (amount, descricao, vencimento, nome, cpf) => {
+const gerarBoleto = async (amount, descricao, vencimento, nome, cpf) => {
 	try {
 		const transaction = await axios.post(
 			'https://api.pagar.me/1/transactions',
@@ -38,4 +38,23 @@ const pay = async (amount, descricao, vencimento, nome, cpf) => {
 	}
 };
 
-module.exports = { pay };
+const pagarBoleto = async (result) => {
+	const {transactionid} = result.rows[0]
+	try {
+		const pagamento = await axios.put(`https://api.pagar.me/1/transactions/${transactionid}`, {
+			api_key: process.env.PAGARME_KEY,
+			status: 'paid',
+		})
+		return pagamento.data;
+	} catch (err) {
+		console.log(err.response.data);
+		return {
+			status: 'error',
+			data: {
+				mensagem: 'Erro no Pagamento',
+			},
+		};
+	}
+}
+
+module.exports = { gerarBoleto, pagarBoleto };

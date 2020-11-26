@@ -1,4 +1,5 @@
 const TabelaClientes = require('../repositories/tabelaClientes');
+const TabelaPagamentos = require('../repositories/tabelaPagamentos');
 const Codigo = require('../utils/code');
 const response = require('../utils/response');
 
@@ -45,10 +46,11 @@ const atualizarCliente = async (ctx) => {
 		email = null,
 		tel = null,
 	} = ctx.request.body;
+	const { idUsuario } = ctx.state;
 	if (!nome || !cpf || !email || !tel || !id) {
 		return response(ctx, 400, { mensagem: 'Mal formatado' });
 	}
-	const verificarCliente = await TabelaClientes.localizarIdCliente(id);
+	const verificarCliente = await TabelaClientes.localizarIdCliente(id, idUsuario);
 	if (verificarCliente.rows.length === 0) {
 		return response(ctx, 400, { mensagem: 'Mal formatado' });
 	}
@@ -61,7 +63,8 @@ const atualizarCliente = async (ctx) => {
 		nome.toLowerCase().trim(),
 		cpfLimpo,
 		email.toLowerCase().trim(),
-		telefoneLimpo
+		telefoneLimpo,
+		idUsuario
 	);
 	const cpfEditado = Codigo.organizarCpf(cpfLimpo);
 	const telefoneEditado = Codigo.organizarTelefone(telefoneLimpo);
@@ -74,16 +77,25 @@ const atualizarCliente = async (ctx) => {
 	});
 };
 const querystring = async (ctx) => {
+	const { idUsuario } = ctx.state;
 	const { offset } = ctx.query;
 	if (ctx.querystring.includes('busca')) {
 		const { busca } = ctx.query;
-		const result = await TabelaClientes.listarClientesPorBusca(
+		const clientes = await TabelaClientes.listarClientesPorBusca(
 			busca,
-			offset
+			offset,
+			idUsuario
 		);
-		return response(ctx, 200, { clientes: result.rows });
+		const boletos =  await TabelaPagamentos.buscarTodosOsBoletos();
+		
+		const dadosDePagamentoDoCliente = Codigo.querystring(clientes, boletos);
+		return response(ctx, 200, { clientes: dadosDePagamentoDoCliente });
 	}
-	const result = await TabelaClientes.listarClientes(offset);
-	return response(ctx, 200, { clientes: result.rows });
+	const clientes = await TabelaClientes.listarClientes(offset, idUsuario);
+	const boletos =  await TabelaPagamentos.buscarTodosOsBoletos();
+	
+	const dadosDePagamentoDoCliente = Codigo.querystring(clientes, boletos);
+	return response(ctx, 200, { clientes: dadosDePagamentoDoCliente });
 };
 module.exports = { adicionarCliente, atualizarCliente, querystring };
+
