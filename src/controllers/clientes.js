@@ -13,19 +13,20 @@ const adicionarCliente = async (ctx) => {
 	const { idUsuario } = ctx.state;
 
 	if (!nome || !cpf || !email || !tel || !idUsuario) {
-		console.log(idUsuario);
 		return response(ctx, 400, { mensagem: 'Mal formatado' });
 	}
-	const verificarCliente = await TabelaClientes.localizarCPF(cpf);
+	const cpfLimpo = Codigo.limparDado(cpf);
+	const verificarCliente = await TabelaClientes.localizarCPF(cpfLimpo, idUsuario);
+	console.log(verificarCliente.rows)
 	if (verificarCliente.rows.length > 0) {
-		const cpfCliente = verificarCliente.rows[0].cpf;
-		if (cpfCliente === cpf) {
+		console.log('ola 1')
+		if (verificarCliente.rows[0].cpf == cpfLimpo) {
+			console.log('olá')
 			return response(ctx, 401, {
-				mensagem: 'Esse cliente já está cadastrado.',
+				mensagem: 'Cpf já cadastrado',
 			});
 		}
 	}
-	const cpfLimpo = Codigo.limparDado(cpf);
 	const result = await TabelaClientes.adicionarClienteNaTabela(
 		nome,
 		cpfLimpo,

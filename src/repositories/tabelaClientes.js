@@ -3,8 +3,8 @@ const database = require('../utils/database');
 /**
  * Função para localizar o cliente pelo CPF
  */
-const localizarCPF = async (cpf) => {
-	const query = `SELECT * FROM clientes WHERE cpf = '${cpf}'`;
+const localizarCPF = async (cpf, idUser) => {
+	const query = `SELECT * FROM clientes WHERE (cpf = '${cpf}' AND idUser = '${idUser}')`;
 	return database.query(query);
 };
 
