@@ -6,10 +6,13 @@ const Codigo = require('../utils/code');
 const response = require('../utils/response');
 
 const criarBoleto = async (ctx) => {
-	const { idClient, descricao, valor, vencimento } = ctx.request.body;
+	const { idDoCliente, descricao, valor, vencimento } = ctx.request.body;
 	const { idUsuario } = ctx.state;
 
-	const result = await TabelaCliente.localizarIdCliente(idClient, idUsuario);
+	const result = await TabelaCliente.localizarIdCliente(
+		idDoCliente,
+		idUsuario
+	);
 	const { nome, cpf } = result.rows[0];
 	if (valor >= 100) {
 		const transaction = await pagarme.gerarBoleto(
@@ -20,7 +23,7 @@ const criarBoleto = async (ctx) => {
 			cpf
 		);
 		await TabelaPagamentos.adicionarBoletoNaTabela(
-			idClient,
+			idDoCliente,
 			descricao,
 			valor,
 			vencimento,
@@ -31,7 +34,7 @@ const criarBoleto = async (ctx) => {
 		return response(ctx, 201, {
 			cobranca: {
 				id: transaction.tid,
-				idClient,
+				idDoCliente,
 				descricao,
 				valor,
 				vencimento,
@@ -44,10 +47,9 @@ const criarBoleto = async (ctx) => {
 };
 
 const querystring = async (ctx) => {
-	const { offset, idClient } = ctx.query;
-	console.log(offset, idClient);
+	const { offset, idDoCliente } = ctx.query;
 
-	const result = await TabelaPagamentos.listarBoletos(offset, idClient);
+	const result = await TabelaPagamentos.listarBoletos(offset, idDoCliente);
 	const cobrancasAtualizadas = [];
 	result.rows.forEach((element, index) => {
 		const { transactionid, ...rest } = element;
@@ -108,7 +110,7 @@ const gerarRelatorio = async (ctx) => {
 	result.rows.sort(Codigo.compararNumeros);
 
 	result.rows.forEach((elemento) => {
-		if (clienteJaVerificado !== elemento.idClient) {
+		if (clienteJaVerificado !== elemento.idDoCliente) {
 			statusJaVerificado = [];
 		}
 		if (!statusJaVerificado.includes(elemento.status)) {
@@ -117,22 +119,22 @@ const gerarRelatorio = async (ctx) => {
 		if (elemento.status === 'waiting_payment') {
 			relatorio.qtdCobrancasPrevistas++;
 			if (
-				clienteJaVerificado !== elemento.idClient ||
+				clienteJaVerificado !== elemento.idDoCliente ||
 				!statusJaVerificado.includes(elemento.status)
 			) {
 				relatorio.qtdClientesAdimplentes++;
-				clienteJaVerificado = elemento.idClient;
+				clienteJaVerificado = elemento.idDoCliente;
 				statusJaVerificado.push(elemento.status);
 			}
 		} else if (elemento.status === 'paid') {
 			relatorio.saldoEmConta += elemento.valor;
 			relatorio.qtdCobrancasPagas++;
 			if (
-				clienteJaVerificado !== elemento.idClient ||
+				clienteJaVerificado !== elemento.idDoCliente ||
 				!statusJaVerificado.includes(elemento.status)
 			) {
 				relatorio.qtdClientesAdimplentes++;
-				clienteJaVerificado = elemento.idClient;
+				clienteJaVerificado = elemento.idDoCliente;
 				statusJaVerificado.push(elemento.status);
 			}
 		} else if (
@@ -141,11 +143,11 @@ const gerarRelatorio = async (ctx) => {
 		) {
 			relatorio.qtdCobrancasVencidas++;
 			if (
-				clienteJaVerificado !== elemento.idClient ||
+				clienteJaVerificado !== elemento.idDoCliente ||
 				!statusJaVerificado.includes(elemento.status)
 			) {
 				relatorio.qtdClientesInadimplentes++;
-				clienteJaVerificado = elemento.idClient;
+				clienteJaVerificado = elemento.idDoCliente;
 				statusJaVerificado.push(elemento.status);
 			}
 		}

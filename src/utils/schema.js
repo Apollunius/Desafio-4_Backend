@@ -19,7 +19,7 @@ const schema = {
 	)`,
 	3: `CREATE TABLE IF NOT EXISTS boletos (
 		id SERIAL PRIMARY KEY,
-		idClient INT NOT NULL,
+		idDoCliente INT NOT NULL,
 		descricao TEXT NOT NULL,
 		valor INT NOT NULL,
 		vencimento DATE NOT NULL,

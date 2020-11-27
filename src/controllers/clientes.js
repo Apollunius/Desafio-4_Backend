@@ -16,12 +16,13 @@ const adicionarCliente = async (ctx) => {
 		return response(ctx, 400, { mensagem: 'Mal formatado' });
 	}
 	const cpfLimpo = Codigo.limparDado(cpf);
-	const verificarCliente = await TabelaClientes.localizarCPF(cpfLimpo, idUsuario);
-	console.log(verificarCliente.rows)
+	const verificarCliente = await TabelaClientes.localizarCPF(
+		cpfLimpo,
+		idUsuario
+	);
+
 	if (verificarCliente.rows.length > 0) {
-		console.log('ola 1')
-		if (verificarCliente.rows[0].cpf == cpfLimpo) {
-			console.log('olá')
+		if (verificarCliente.rows[0].cpf === cpfLimpo) {
 			return response(ctx, 401, {
 				mensagem: 'Cpf já cadastrado',
 			});
@@ -107,7 +108,6 @@ const querystring = async (ctx) => {
 	const clientes = await TabelaClientes.listarClientes(offset, idUsuario);
 	const boletos = await TabelaPagamentos.buscarTodosOsBoletos();
 	const result = await TabelaClientes.listarTodosClientes(idUsuario);
-	console.log(result.rows.length);
 	const totalClientes = Math.ceil(result.rows.length / 10);
 	const numeroDaPagina = offset / 10 + 1;
 

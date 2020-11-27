@@ -1,7 +1,7 @@
 const database = require('../utils/database');
 
 const adicionarBoletoNaTabela = async (
-	idClient,
+	idDoCliente,
 	descricao,
 	valor,
 	vencimento,
@@ -10,10 +10,10 @@ const adicionarBoletoNaTabela = async (
 	transactionId
 ) => {
 	const query = {
-		text: `INSERT INTO boletos (idClient, descricao, valor, vencimento, link, status, transactionId)
+		text: `INSERT INTO boletos (idDoCliente, descricao, valor, vencimento, link, status, transactionId)
 	VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
 		values: [
-			idClient,
+			idDoCliente,
 			descricao,
 			valor,
 			vencimento,
@@ -25,8 +25,8 @@ const adicionarBoletoNaTabela = async (
 	return database.query(query);
 };
 
-const listarBoletos = async (offset, idClient) => {
-	const query = `SELECT * FROM boletos WHERE idClient = '${idClient}' LIMIT 10 OFFSET ${offset}`;
+const listarBoletos = async (offset, idDoCliente) => {
+	const query = `SELECT * FROM boletos WHERE idDoCliente = '${idDoCliente}' LIMIT 10 OFFSET ${offset}`;
 	return database.query(query);
 };
 
@@ -49,7 +49,7 @@ const buscarTodosOsBoletos = async () => {
 	return database.query(query);
 };
 const relatorio = async (idUser) => {
-	const query = `SELECT TABELA2.idClient, TABELA2.valor, TABELA2.vencimento, TABELA2.status FROM (SELECT * FROM clientes WHERE idUser = '${idUser}') AS TABELA1 INNER JOIN (SELECT * FROM boletos) AS TABELA2 ON TABELA1.id = TABELA2.idClient`;
+	const query = `SELECT TABELA2.idDoCliente, TABELA2.valor, TABELA2.vencimento, TABELA2.status FROM (SELECT * FROM clientes WHERE idUser = '${idUser}') AS TABELA1 INNER JOIN (SELECT * FROM boletos) AS TABELA2 ON TABELA1.id = TABELA2.idDoCliente`;
 
 	return database.query(query);
 };
