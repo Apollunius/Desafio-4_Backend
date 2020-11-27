@@ -11,7 +11,6 @@ const adicionarUsuario = async (ctx) => {
 
 	// verifica se o email solicitado já existe na tabela.
 	const resultDados = await TabelaUsuarios.localizarUsuario(email);
-	console.log(resultDados.rows);
 	if (resultDados.rows.length > 0) {
 		const emailUsuario = resultDados.rows[0].email;
 		if (emailUsuario === email) {
@@ -29,7 +28,7 @@ const adicionarUsuario = async (ctx) => {
 	const { id } = result.rows.shift();
 	enviarEmail(
 		email,
-		'Cadastro realizado com sucesso!!',
+		'Cadastro realizado com sucesso!',
 		`<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 		<html xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
 		<head>

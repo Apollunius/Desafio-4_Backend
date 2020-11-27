@@ -16,7 +16,7 @@ const transport = nodemailer.createTransport(config);
 
 const enviarEmail = async (to, subject, html) => {
 	const email = await transport.sendMail({
-		from: '"Tchawan" <thau@cubos.academy>',
+		from: '"Bill & Ted" <billted@cubos.academy>',
 		to,
 		subject,
 		html,
