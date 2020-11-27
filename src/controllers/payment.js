@@ -50,6 +50,7 @@ const querystring = async (ctx) => {
 	const { offset, idDoCliente } = ctx.query;
 
 	const result = await TabelaPagamentos.listarBoletos(offset, idDoCliente);
+	console.log(result.rows)
 	const cobrancasAtualizadas = [];
 	result.rows.forEach((element, index) => {
 		const { transactionid, ...rest } = element;
@@ -71,14 +72,14 @@ const querystring = async (ctx) => {
 };
 
 const pagarBoleto = async (ctx) => {
-	const { id } = ctx.request.body;
-	const result = await TabelaPagamentos.buscarBoleto(id);
+	const { idDaCobranca } = ctx.request.body;
+	const result = await TabelaPagamentos.buscarBoleto(idDaCobranca);
 	if (result) {
 		if (Date.now() - result.rows[0].vencimento.getTime() <= 0) {
 			if (result.rows[0].status === 'waiting_payment') {
 				const pagamento = await pagarme.pagarBoleto(result);
 				if (pagamento.status === 'paid') {
-					await TabelaPagamentos.pagarBoleto(id);
+					await TabelaPagamentos.pagarBoleto(idDaCobranca);
 					return response(ctx, 200, {
 						mensagem: 'Cobrança paga com sucesso',
 					});
