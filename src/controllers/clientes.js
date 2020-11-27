@@ -11,10 +11,9 @@ const adicionarCliente = async (ctx) => {
 		tel = null,
 	} = ctx.request.body;
 	const { idUsuario } = ctx.state;
-	
-	
+
 	if (!nome || !cpf || !email || !tel || !idUsuario) {
-		console.log(idUsuario)
+		console.log(idUsuario);
 		return response(ctx, 400, { mensagem: 'Mal formatado' });
 	}
 	const verificarCliente = await TabelaClientes.localizarCPF(cpf);
@@ -50,7 +49,10 @@ const atualizarCliente = async (ctx) => {
 	if (!nome || !cpf || !email || !tel || !id) {
 		return response(ctx, 400, { mensagem: 'Mal formatado' });
 	}
-	const verificarCliente = await TabelaClientes.localizarIdCliente(id, idUsuario);
+	const verificarCliente = await TabelaClientes.localizarIdCliente(
+		id,
+		idUsuario
+	);
 	if (verificarCliente.rows.length === 0) {
 		return response(ctx, 400, { mensagem: 'Mal formatado' });
 	}
@@ -86,16 +88,33 @@ const querystring = async (ctx) => {
 			offset,
 			idUsuario
 		);
-		const boletos =  await TabelaPagamentos.buscarTodosOsBoletos();
-		
+		const boletos = await TabelaPagamentos.buscarTodosOsBoletos();
+		const result = await TabelaClientes.listarTodosClientesPorBusca(
+			busca,
+			idUsuario
+		);
+		const totalClientes = Math.ceil(result.rows.length / 10);
+		const numeroDaPagina = offset / 10 + 1;
+
 		const dadosDePagamentoDoCliente = Codigo.querystring(clientes, boletos);
-		return response(ctx, 200, { clientes: dadosDePagamentoDoCliente });
+		return response(ctx, 200, {
+			paginaAtual: numeroDaPagina,
+			totalDePaginas: totalClientes,
+			clientes: dadosDePagamentoDoCliente,
+		});
 	}
 	const clientes = await TabelaClientes.listarClientes(offset, idUsuario);
-	const boletos =  await TabelaPagamentos.buscarTodosOsBoletos();
-	
+	const boletos = await TabelaPagamentos.buscarTodosOsBoletos();
+	const result = await TabelaClientes.listarTodosClientes(idUsuario);
+	console.log(result.rows.length);
+	const totalClientes = Math.ceil(result.rows.length / 10);
+	const numeroDaPagina = offset / 10 + 1;
+
 	const dadosDePagamentoDoCliente = Codigo.querystring(clientes, boletos);
-	return response(ctx, 200, { clientes: dadosDePagamentoDoCliente });
+	return response(ctx, 200, {
+		paginaAtual: numeroDaPagina,
+		totalDePaginas: totalClientes,
+		clientes: dadosDePagamentoDoCliente,
+	});
 };
 module.exports = { adicionarCliente, atualizarCliente, querystring };
-
