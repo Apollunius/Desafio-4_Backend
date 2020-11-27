@@ -26,7 +26,7 @@ const adicionarBoletoNaTabela = async (
 };
 
 const listarBoletos = async (offset, idDoCliente) => {
-	const query = `SELECT * FROM boletos WHERE idDoCliente = '${idDoCliente}' LIMIT 10 OFFSET ${offset}`;
+	const query = `SELECT * FROM boletos WHERE idDoCliente = '${idDoCliente}' ORDER BY id ASC LIMIT 10 OFFSET ${offset}`;
 	return database.query(query);
 };
 
@@ -40,12 +40,12 @@ const boletoVencido = async (idCobranca) => {
 };
 
 const buscarBoleto = async (idCobranca) => {
-	const query = `SELECT * FROM boletos WHERE id = '${idCobranca}'`;
+	const query = `SELECT * FROM boletos WHERE id = '${idCobranca}' ORDER BY id ASC`;
 	return database.query(query);
 };
 
 const buscarTodosOsBoletos = async () => {
-	const query = `SELECT * FROM boletos`;
+	const query = `SELECT * FROM boletos ORDER BY id ASC`;
 	return database.query(query);
 };
 const relatorio = async (idUser) => {
