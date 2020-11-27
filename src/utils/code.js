@@ -1,4 +1,3 @@
-
 const limparDado = (dado) => {
 	return dado.replace(/[^\d]/g, ''); // isso aqui é pra usar regex pra retirar qualquer pontuação que possua.
 };
@@ -9,53 +8,67 @@ const organizarCpf = (cpf) => {
 };
 
 const organizarTelefone = (telefone) => {
-	const telefoneLimpo = limparDado(telefone)
-	if(telefoneLimpo.length == 13) {
-		return telefoneLimpo.replace(/(\d{2})(\d{2})(\d{5})(\d{4})/, '+$1 $2 $3-$4');
-	} else if (telefoneLimpo.length == 12) {
-		return telefoneLimpo.replace(/(\d{2})(\d{2})(\d{4})(\d{4})/, '+$1 $2 $3-$4');
-	} else if (telefoneLimpo.length == 11) {
+	const telefoneLimpo = limparDado(telefone);
+	if (telefoneLimpo.length == 13) {
+		return telefoneLimpo.replace(
+			/(\d{2})(\d{2})(\d{5})(\d{4})/,
+			'+$1 $2 $3-$4'
+		);
+	}
+	if (telefoneLimpo.length == 12) {
+		return telefoneLimpo.replace(
+			/(\d{2})(\d{2})(\d{4})(\d{4})/,
+			'+$1 $2 $3-$4'
+		);
+	}
+	if (telefoneLimpo.length == 11) {
 		return telefoneLimpo.replace(/(\d{2})(\d{5})(\d{4})/, '$1 $2-$3');
-	} else if (telefoneLimpo.length == 10) {
+	}
+	if (telefoneLimpo.length == 10) {
 		return telefoneLimpo.replace(/(\d{2})(\d{4})(\d{4})/, '$1 $2-$3');
 	}
-	
 };
 const querystring = (clientes, boletos) => {
 	const dadosDePagamentoDoCliente = [];
-	
+
 	clientes.rows.forEach((cliente, index) => {
 		let cobrancasFeitas = 0;
 		let cobrancasRecebidas = 0;
 		let estaInadimplente = false;
-		boletos.rows.forEach(boleto => {
-			
-			if(cliente.id == boleto.idclient) {
+		boletos.rows.forEach((boleto) => {
+			if (cliente.id == boleto.idclient) {
 				cobrancasFeitas += boleto.valor;
 
-				if(boleto.status == 'paid' || boleto.status == 'PAGO' ) {
+				if (boleto.status == 'paid' || boleto.status == 'PAGO') {
 					cobrancasRecebidas += boleto.valor;
 				}
-				if((boleto.status == 'VENCIDO') || ((Date.now() - boleto.vencimento.getTime()) > 0)) {
+				if (
+					boleto.status == 'VENCIDO' ||
+					Date.now() - boleto.vencimento.getTime() > 0
+				) {
 					estaInadimplente = true;
 				}
 			}
-		
-		})
+		});
 		dadosDePagamentoDoCliente[index] = {
 			nome: cliente.nome,
 			id: cliente.id,
 			email: cliente.email,
-			cobrancasFeitas: cobrancasFeitas,
-			cobrancasRecebidas: cobrancasRecebidas,
-			estaInadimplente: estaInadimplente
-		}
+			cobrancasFeitas,
+			cobrancasRecebidas,
+			estaInadimplente,
+		};
 	});
 	return dadosDePagamentoDoCliente;
-}
+};
 
 const compararNumeros = (a, b) => {
 	return a.idClient - b.idClient;
-  }
-module.exports = { organizarCpf, limparDado, organizarTelefone, querystring, compararNumeros };
-
+};
+module.exports = {
+	organizarCpf,
+	limparDado,
+	organizarTelefone,
+	querystring,
+	compararNumeros,
+};

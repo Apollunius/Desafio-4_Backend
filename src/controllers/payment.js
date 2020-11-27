@@ -1,16 +1,12 @@
+/* eslint-disable no-plusplus */
 const pagarme = require('../utils/pagarme');
 const TabelaCliente = require('../repositories/tabelaClientes');
-const TabelaPagamentos = require('../repositories/tabelaPagamentos')
-const Codigo = require('../utils/code')
+const TabelaPagamentos = require('../repositories/tabelaPagamentos');
+const Codigo = require('../utils/code');
 const response = require('../utils/response');
 
 const criarBoleto = async (ctx) => {
-	const {
-		idClient,
-		descricao,
-		valor,
-		vencimento,
-	} = ctx.request.body;
+	const { idClient, descricao, valor, vencimento } = ctx.request.body;
 	const { idUsuario } = ctx.state;
 
 	const result = await TabelaCliente.localizarIdCliente(idClient, idUsuario);
@@ -40,7 +36,7 @@ const criarBoleto = async (ctx) => {
 				valor,
 				vencimento,
 				linkDoBoleto: transaction.boleto_url,
-				status: "AGUARDANDO",
+				status: 'AGUARDANDO',
 			},
 		});
 	}
@@ -49,103 +45,113 @@ const criarBoleto = async (ctx) => {
 
 const querystring = async (ctx) => {
 	const { offset, idClient } = ctx.query;
-	console.log(offset, idClient)
+	console.log(offset, idClient);
 
 	const result = await TabelaPagamentos.listarBoletos(offset, idClient);
 	const cobrancasAtualizadas = [];
-	result.rows.forEach((element, index)  => {
-		const {transactionid, ...rest} = element
-		cobrancasAtualizadas.push(rest)
-		
-		if(element.status == 'waiting_payment') {
-			cobrancasAtualizadas[index].status = 'AGUARDANDO'
-		} else if (element.status == 'paid') {
-			cobrancasAtualizadas[index].status = "PAGO"
+	result.rows.forEach((element, index) => {
+		const { transactionid, ...rest } = element;
+		cobrancasAtualizadas.push(rest);
+
+		if (element.status === 'waiting_payment') {
+			cobrancasAtualizadas[index].status = 'AGUARDANDO';
+		} else if (element.status === 'paid') {
+			cobrancasAtualizadas[index].status = 'PAGO';
 		} else {
-			cobrancasAtualizadas[index].status = 'VENCIDO'
+			cobrancasAtualizadas[index].status = 'VENCIDO';
 		}
-		if((Date.now() - element.vencimento.getTime()) > 0) {
+		if (Date.now() - element.vencimento.getTime() > 0) {
 			TabelaPagamentos.boletoVencido(element.id);
-		}	
+		}
 	});
-	
+
 	return response(ctx, 200, { cobrancas: cobrancasAtualizadas });
 };
 
 const pagarBoleto = async (ctx) => {
-	const {id} = ctx.request.body;
+	const { id } = ctx.request.body;
 	const result = await TabelaPagamentos.buscarBoleto(id);
-	if (!result) {
-		return response(ctx, 400, { mensagem: 'Mal formatado' });
-	}
-	if((Date.now() - result.rows[0].vencimento.getTime()) <= 0) {
-		if(result.rows[0].status === 'waiting_payment'){
-			const pagamento = await pagarme.pagarBoleto(result);
-			if(pagamento.status === "paid") {
-				await TabelaPagamentos.pagarBoleto(id)
-				return response(ctx, 200, { mensagem: 'Cobrança paga com sucesso' });
+	if (result) {
+		if (Date.now() - result.rows[0].vencimento.getTime() <= 0) {
+			if (result.rows[0].status === 'waiting_payment') {
+				const pagamento = await pagarme.pagarBoleto(result);
+				if (pagamento.status === 'paid') {
+					await TabelaPagamentos.pagarBoleto(id);
+					return response(ctx, 200, {
+						mensagem: 'Cobrança paga com sucesso',
+					});
+				}
+			} else {
+				return response(ctx, 200, { mensagem: 'Cobrança já paga' });
 			}
 		} else {
-			return response(ctx, 200, { mensagem: 'Cobrança já paga' });
+			await TabelaPagamentos.boletoVencido(id);
+			return response(ctx, 200, { mensagem: 'Cobrança vencido' });
 		}
-
-	} else {
-		await TabelaPagamentos.boletoVencido(id);
-		return response(ctx, 200, { mensagem: 'Cobrança vencido' });
 	}
-	
-}
+	return response(ctx, 400, { mensagem: 'Mal formatado' });
+};
 
-const relatorio = async (ctx) => {
+const gerarRelatorio = async (ctx) => {
 	const { idUsuario } = ctx.state;
-	const result = await TabelaPagamentos.relatorio(idUsuario)
-	let relatorio = {
+	const result = await TabelaPagamentos.relatorio(idUsuario);
+	const relatorio = {
 		qtdClientesAdimplentes: 0,
 		qtdClientesInadimplentes: 0,
 		qtdCobrancasPrevistas: 0,
 		qtdCobrancasPagas: 0,
 		qtdCobrancasVencidas: 0,
-		saldoEmConta: 0
-	}
+		saldoEmConta: 0,
+	};
 	let clienteJaVerificado = null;
 	let statusJaVerificado = [];
-	result.rows.sort(Codigo.compararNumeros)
+	result.rows.sort(Codigo.compararNumeros);
 
-	result.rows.forEach((elemento, index) => {
-		if(clienteJaVerificado != elemento.idClient) {
-			statusJaVerificado = []
+	result.rows.forEach((elemento) => {
+		if (clienteJaVerificado !== elemento.idClient) {
+			statusJaVerificado = [];
 		}
-		if(!statusJaVerificado.includes(elemento.status)) {
+		if (!statusJaVerificado.includes(elemento.status)) {
 			clienteJaVerificado = null;
 		}
-		if(elemento.status == 'waiting_payment') {
+		if (elemento.status === 'waiting_payment') {
 			relatorio.qtdCobrancasPrevistas++;
-			if(clienteJaVerificado != elemento.idClient || !statusJaVerificado.includes(elemento.status)){
+			if (
+				clienteJaVerificado !== elemento.idClient ||
+				!statusJaVerificado.includes(elemento.status)
+			) {
 				relatorio.qtdClientesAdimplentes++;
 				clienteJaVerificado = elemento.idClient;
-				statusJaVerificado.push(elemento.status);	
+				statusJaVerificado.push(elemento.status);
 			}
-		} else if(elemento.status == 'paid'){
+		} else if (elemento.status === 'paid') {
 			relatorio.saldoEmConta += elemento.valor;
-			relatorio.qtdCobrancasPagas++
-			if(clienteJaVerificado != elemento.idClient || !statusJaVerificado.includes(elemento.status)){
+			relatorio.qtdCobrancasPagas++;
+			if (
+				clienteJaVerificado !== elemento.idClient ||
+				!statusJaVerificado.includes(elemento.status)
+			) {
 				relatorio.qtdClientesAdimplentes++;
 				clienteJaVerificado = elemento.idClient;
-				statusJaVerificado.push(elemento.status);	
+				statusJaVerificado.push(elemento.status);
 			}
-		} else if(elemento.status == 'VENCIDO' || ((Date.now() - elemento.vencimento.getTime()) > 0)){
-			relatorio.qtdCobrancasVencidas++
-			if(clienteJaVerificado != elemento.idClient || !statusJaVerificado.includes(elemento.status)){
+		} else if (
+			elemento.status === 'VENCIDO' ||
+			Date.now() - elemento.vencimento.getTime() > 0
+		) {
+			relatorio.qtdCobrancasVencidas++;
+			if (
+				clienteJaVerificado !== elemento.idClient ||
+				!statusJaVerificado.includes(elemento.status)
+			) {
 				relatorio.qtdClientesInadimplentes++;
 				clienteJaVerificado = elemento.idClient;
-				statusJaVerificado.push(elemento.status);	
+				statusJaVerificado.push(elemento.status);
 			}
 		}
+	});
 
-	})
-	
-	return response(ctx, 200, {relatorio: relatorio});
-}
+	return response(ctx, 200, { relatorio });
+};
 
-
-module.exports = { criarBoleto, querystring, pagarBoleto, relatorio };
+module.exports = { criarBoleto, querystring, pagarBoleto, gerarRelatorio };

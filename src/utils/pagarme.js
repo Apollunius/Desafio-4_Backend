@@ -39,12 +39,15 @@ const gerarBoleto = async (amount, descricao, vencimento, nome, cpf) => {
 };
 
 const pagarBoleto = async (result) => {
-	const {transactionid} = result.rows[0]
+	const { transactionid } = result.rows[0];
 	try {
-		const pagamento = await axios.put(`https://api.pagar.me/1/transactions/${transactionid}`, {
-			api_key: process.env.PAGARME_KEY,
-			status: 'paid',
-		})
+		const pagamento = await axios.put(
+			`https://api.pagar.me/1/transactions/${transactionid}`,
+			{
+				api_key: process.env.PAGARME_KEY,
+				status: 'paid',
+			}
+		);
 		return pagamento.data;
 	} catch (err) {
 		console.log(err.response.data);
@@ -55,6 +58,6 @@ const pagarBoleto = async (result) => {
 			},
 		};
 	}
-}
+};
 
 module.exports = { gerarBoleto, pagarBoleto };

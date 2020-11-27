@@ -18,7 +18,11 @@ const autenticar = async (ctx) => {
 
 		if (comparision) {
 			const token = await jwt.sign(
-				{ email: usuario.email, idUsuario: usuario.id, nome: usuario.nome },
+				{
+					email: usuario.email,
+					idUsuario: usuario.id,
+					nome: usuario.nome,
+				},
 				process.env.JWT_SECRET || 'cubosacademy',
 				{ expiresIn: '1h' }
 			);
