@@ -34,7 +34,15 @@ const listarClientes = async (offset, idUser) => {
 };
 
 const listarClientesPorBusca = async (string, offset, idUser) => {
-	const query = `SELECT * FROM clientes WHERE ((nome LIKE '%${string}%' OR email = '${string}' OR cpf = '${string}') AND idUser = ${idUser}) LIMIT 10 OFFSET ${offset}`;
+	const query = `SELECT * FROM clientes WHERE ((nome ILIKE '%${string}%' OR email = '${string}' OR cpf = '${string}') AND idUser = ${idUser}) LIMIT 10 OFFSET ${offset}`;
+	return database.query(query);
+};
+const listarTodosClientes = async (idUser) => {
+	const query = `SELECT * FROM clientes WHERE idUser = ${idUser}`;
+	return database.query(query);
+};
+const listarTodosClientesPorBusca = async (string, idUser) => {
+	const query = `SELECT * FROM clientes WHERE ((nome ILIKE '%${string}%' OR email = '${string}' OR cpf = '${string}') AND idUser = ${idUser})`;
 	return database.query(query);
 };
 
@@ -45,4 +53,6 @@ module.exports = {
 	atualizarCliente,
 	listarClientes,
 	listarClientesPorBusca,
+	listarTodosClientes,
+	listarTodosClientesPorBusca,
 };
