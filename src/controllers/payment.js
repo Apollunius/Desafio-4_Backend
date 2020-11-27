@@ -13,7 +13,11 @@ const criarBoleto = async (ctx) => {
 		idDoCliente,
 		idUsuario
 	);
+	if(result.rows.length === 0) {
+		return response(ctx, 403, { mensagem: 'Não autorizado' });
+	}
 	const { nome, cpf } = result.rows[0];
+	
 	if (valor >= 100) {
 		const transaction = await pagarme.gerarBoleto(
 			valor,
@@ -50,7 +54,6 @@ const querystring = async (ctx) => {
 	const { offset, idDoCliente } = ctx.query;
 
 	const result = await TabelaPagamentos.listarBoletos(offset, idDoCliente);
-	console.log(result.rows)
 	const cobrancasAtualizadas = [];
 	result.rows.forEach((element, index) => {
 		const { transactionid, ...rest } = element;

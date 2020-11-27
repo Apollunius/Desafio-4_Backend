@@ -36,7 +36,7 @@ const querystring = (clientes, boletos) => {
 		let cobrancasRecebidas = 0;
 		let estaInadimplente = false;
 		boletos.rows.forEach((boleto) => {
-			if (cliente.id == boleto.idclient) {
+			if (cliente.id == boleto.iddocliente) {
 				cobrancasFeitas += boleto.valor;
 
 				if (boleto.status == 'paid' || boleto.status == 'PAGO') {
@@ -63,7 +63,7 @@ const querystring = (clientes, boletos) => {
 };
 
 const compararNumeros = (a, b) => {
-	return a.idClient - b.idClient;
+	return a.iddocliente - b.iddocliente;
 };
 module.exports = {
 	organizarCpf,
