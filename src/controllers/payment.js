@@ -4,11 +4,13 @@ const TabelaCliente = require('../repositories/tabelaClientes');
 const TabelaPagamentos = require('../repositories/tabelaPagamentos');
 const Codigo = require('../utils/code');
 const response = require('../utils/response');
+const { enviarEmail } = require('../utils/email');
 
 const criarBoleto = async (ctx) => {
 	const { idDoCliente, descricao, valor, vencimento } = ctx.request.body;
+	const vencimentoPadrao = Codigo.dataPadrao(vencimento)
+	console.log(vencimentoPadrao)
 	const { idUsuario } = ctx.state;
-
 	const result = await TabelaCliente.localizarIdCliente(
 		idDoCliente,
 		idUsuario
@@ -22,7 +24,7 @@ const criarBoleto = async (ctx) => {
 		const transaction = await pagarme.gerarBoleto(
 			valor,
 			descricao,
-			vencimento,
+			vencimentoPadrao,
 			nome,
 			cpf
 		);
@@ -30,14 +32,20 @@ const criarBoleto = async (ctx) => {
 			idDoCliente,
 			descricao,
 			valor,
-			vencimento,
+			vencimentoPadrao,
 			transaction.boleto_url,
 			transaction.status,
 			transaction.tid
 		);
+		const vencimentoOrganizado = Codigo.organizarData(vencimento);
+		const valorOrganizado = Codigo.organizarValor(valor)
+		enviarEmail(
+			result.rows[0].email,
+			'Boleto gerado com sucesso!',
+			Codigo.htmlParaEmail(`${transaction.boleto_url}`, 'Pagar o boleto!', `Caso o link acima não funcione, favor realizar o pagamento utilizando o código de barras a seguir: ${transaction.boleto_barcode}`, `Olá ${nome}! Gostariamos de informar que ${ctx.state.nome} gerou para você um boleto no valor de R$ ${valorOrganizado} com vencimento: ${vencimentoOrganizado}.`)
+		);
 		return response(ctx, 201, {
 			cobranca: {
-				id: transaction.tid,
 				idDoCliente,
 				descricao,
 				valor,
