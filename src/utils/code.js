@@ -1,9 +1,13 @@
+const { cpf } = require('cpf-cnpj-validator');
+
 const limparDado = (dado) => {
 	return dado.replace(/[^\d]/g, ''); // isso aqui é pra usar regex pra retirar qualquer pontuação que possua.
 };
-
-const organizarCpf = (cpf) => {
-	const cpfLimpo = limparDado(cpf);
+const validarCPF = (cpfCliente) => {
+	return cpf.isValid(cpfCliente);
+};
+const organizarCpf = (cpfCliente) => {
+	const cpfLimpo = limparDado(cpfCliente);
 	return cpfLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4'); // isso aqui é pra formatar o cpf no padrão xxx.xxx.xxx-xx.
 };
 
@@ -31,51 +35,39 @@ const organizarTelefone = (telefone) => {
 
 const organizarData = (data) => {
 	const dataLimpa = data.replace(/[^\d]/g, '');
-	return dataLimpa.replace(
-		/(\d{4})(\d{2})(\d{2})/,
-		'$3/$2/$1'
-	);
+	return dataLimpa.replace(/(\d{4})(\d{2})(\d{2})/, '$3/$2/$1');
 };
 const dataPadrao = (data) => {
 	let regra;
 
-	if(data[2] === '/') {
-		regra = 1
-	} else if(data[2] === '-') {
-		regra = 2
+	if (data[2] === '/') {
+		regra = 1;
+	} else if (data[2] === '-') {
+		regra = 2;
+	} else if (data[4] === '/') {
+		regra = 3;
 	} else {
-		if(data[4] == '/') {
-			regra = 3
-		} else {
-			regra = 4
-		};
-	};
+		regra = 4;
+	}
 
-	if(regra === 1 || regra === 2){
+	if (regra === 1 || regra === 2) {
 		const dataLimpa = data.replace(/[^\d]/g, '');
-		return dataLimpa.replace(
-			/(\d{2})(\d{2})(\d{4})/,
-			'$3-$2-$1'
-		);
-	} else {
-		const dataLimpa = data.replace(/[^\d]/g, '');
-		return dataLimpa.replace(
-			/(\d{4})(\d{2})(\d{2})/,
-			'$1-$2-$3'
-		);
-	};
+		return dataLimpa.replace(/(\d{2})(\d{2})(\d{4})/, '$3-$2-$1');
+	}
+	const dataLimpa = data.replace(/[^\d]/g, '');
+	return dataLimpa.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
 };
 
-const organizarValor = (valor) => {      
-      const decimal = (valor/100);
-      
-      let strString = decimal.toString();
-      
-    	//substitui separador decimal ponto por virgula
-    	strString=strString.replace(".", ",");
-    	//a regex abaixo coloca um ponto a esquerda de cada grupo de 3 dígitos desde que não seja no inicio do numero
-    	return  strString.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-}
+const organizarValor = (valor) => {
+	const decimal = valor / 100;
+
+	let strString = decimal.toString();
+
+	// substitui separador decimal ponto por virgula
+	strString = strString.replace('.', ',');
+	// a regex abaixo coloca um ponto a esquerda de cada grupo de 3 dígitos desde que não seja no inicio do numero
+	return strString.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+};
 
 const querystring = (clientes, boletos) => {
 	const dadosDePagamentoDoCliente = [];
@@ -116,7 +108,7 @@ const compararNumeros = (a, b) => {
 };
 
 const htmlParaEmail = (link, texto, boleto, confirmacao) => {
-	return (`<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 		<html xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
 		<head>
 		<meta name="viewport" content="width=device-width" />
@@ -200,9 +192,10 @@ const htmlParaEmail = (link, texto, boleto, confirmacao) => {
 				</td>
 				<td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;" valign="top"></td>
 			</tr></table></body>
-		</html>`)
-}
+		</html>`;
+};
 module.exports = {
+	validarCPF,
 	organizarCpf,
 	limparDado,
 	organizarTelefone,
@@ -211,5 +204,5 @@ module.exports = {
 	htmlParaEmail,
 	organizarData,
 	organizarValor,
-	dataPadrao
+	dataPadrao,
 };
