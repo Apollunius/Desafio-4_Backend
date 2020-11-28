@@ -3,6 +3,9 @@ const TabelaPagamentos = require('../repositories/tabelaPagamentos');
 const Codigo = require('../utils/code');
 const response = require('../utils/response');
 
+/**
+ * Adiciona o cliente do usuário na tabela de clientes.
+ */
 const adicionarCliente = async (ctx) => {
 	const {
 		nome = null,
@@ -39,6 +42,9 @@ const adicionarCliente = async (ctx) => {
 	return response(ctx, 201, { id: `${id}` });
 };
 
+/**
+ * Atualizar os dados do cliente na tabela clientes
+ */
 const atualizarCliente = async (ctx) => {
 	const {
 		id = null,
@@ -80,6 +86,12 @@ const atualizarCliente = async (ctx) => {
 		tel: telefoneEditado,
 	});
 };
+
+/**
+ * Buscar ou listar clientes do usuário.
+ * caso tenha não tenha nenhum conteúdo na busca, ele vai agir como listagem dos clientes.
+ * caso tenha algum conteudo na querystring, ele iria buscar por nome, email ou cpf do cliente conforme solicitado na query.
+ */
 const querystring = async (ctx) => {
 	const { idUsuario } = ctx.state;
 	const { offset } = ctx.query;
