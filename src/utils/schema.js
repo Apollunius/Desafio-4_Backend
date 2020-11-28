@@ -1,3 +1,5 @@
+/* eslint-disable guard-for-in */
+/* eslint-disable no-await-in-loop */
 const database = require('./database');
 
 const schema = {
@@ -14,16 +16,18 @@ const schema = {
 		cpf VARCHAR(14) NOT NULL,
 		email VARCHAR(50) NOT NULL,
 		tel VARCHAR(14) NOT NULL,
-		idUser INT NOT NULL
+		idUser INT NOT NULL,
+		estaInadimplente BOOL DEFAULT FALSE
 	)`,
 	3: `CREATE TABLE IF NOT EXISTS boletos (
 		id SERIAL PRIMARY KEY,
-		valor INT,
-		vencimento DATE,
-		cliente INT,
-		descricao TEXT,
-		link TEXT,
-		dataPagamento DATE
+		idDoCliente INT NOT NULL,
+		descricao TEXT NOT NULL,
+		valor INT NOT NULL,
+		vencimento DATE NOT NULL,
+		link TEXT NOT NULL,
+		status TEXT NOT NULL DEFAULT 'AGUARDANDO',
+		transactionId TEXT NOT NULL
 	)`,
 };
 
@@ -43,6 +47,7 @@ const drop = async (nomeTabela) => {
  */
 const up = async (numeroSchema = null) => {
 	if (!numeroSchema) {
+		// eslint-disable-next-line no-restricted-syntax
 		for (const value in schema) {
 			await database.query({ text: schema[value] });
 		}
@@ -52,7 +57,8 @@ const up = async (numeroSchema = null) => {
 	console.log('Migração executada!');
 };
 
+// Comentar as funções que não irá usar.
 up();
-// drop('usuarios');
-// drop('clientes');
-// drop('boletos');
+drop('usuarios');
+drop('clientes');
+drop('boletos');

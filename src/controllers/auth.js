@@ -4,6 +4,10 @@ const Password = require('../utils/password');
 const response = require('../utils/response');
 require('dotenv').config();
 
+/**
+ * Autentica o email e senha do usuário verificando o banco de dados
+ * e gera um token que expira em 1 hoda.
+ */
 const autenticar = async (ctx) => {
 	const { email = null, senha = null } = ctx.request.body;
 
@@ -18,11 +22,14 @@ const autenticar = async (ctx) => {
 
 		if (comparision) {
 			const token = await jwt.sign(
-				{ email: usuario.email },
+				{
+					email: usuario.email,
+					idUsuario: usuario.id,
+					nome: usuario.nome,
+				},
 				process.env.JWT_SECRET || 'cubosacademy',
 				{ expiresIn: '1h' }
 			);
-
 			return response(ctx, 200, {
 				mensagem: `Usuário logado com sucesso!`,
 				token: `${token}`,
