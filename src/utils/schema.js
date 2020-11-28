@@ -1,3 +1,5 @@
+/* eslint-disable guard-for-in */
+/* eslint-disable no-await-in-loop */
 const database = require('./database');
 
 const schema = {
@@ -45,6 +47,7 @@ const drop = async (nomeTabela) => {
  */
 const up = async (numeroSchema = null) => {
 	if (!numeroSchema) {
+		// eslint-disable-next-line no-restricted-syntax
 		for (const value in schema) {
 			await database.query({ text: schema[value] });
 		}
@@ -54,7 +57,8 @@ const up = async (numeroSchema = null) => {
 	console.log('Migração executada!');
 };
 
+// Comentar as funções que não irá usar.
 up();
-// drop('usuarios');
-// drop('clientes');
-// drop('boletos');
+drop('usuarios');
+drop('clientes');
+drop('boletos');

@@ -2,7 +2,7 @@ const TabelaUsuarios = require('../repositories/tabelaUsuarios');
 const response = require('../utils/response');
 const Password = require('../utils/password');
 const { enviarEmail } = require('../utils/email');
-const Codigo = require('../utils/code')
+const Codigo = require('../utils/code');
 
 const adicionarUsuario = async (ctx) => {
 	const { email = null, senha = null, nome = null } = ctx.request.body;
@@ -30,7 +30,12 @@ const adicionarUsuario = async (ctx) => {
 	enviarEmail(
 		email,
 		'Cadastro realizado com sucesso!',
-		Codigo.htmlParaEmail('http://www.mailgun.com','Confirmar o email!', '', 'Por favor confirme seu endereço de email clicando pelo link abaixo.')
+		Codigo.htmlParaEmail(
+			'http://www.mailgun.com',
+			'Confirmar o email!',
+			'',
+			'Por favor confirme seu endereço de email clicando pelo link abaixo.'
+		)
 	);
 	return response(ctx, 201, { id: `${id}` });
 };

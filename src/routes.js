@@ -15,7 +15,7 @@ router.put('/clientes', Session.verify, Clients.atualizarCliente); // editar cli
 router.get('/clientes', Session.verify, Clients.querystring); // listar clientes ou buscar cliente específico
 
 router.post('/cobrancas', Session.verify, Payment.criarBoleto); // criar cobranças
-router.get('/cobrancas', Session.verify, Payment.querystring); // listar cobranças (verificar a querystring)
+router.get('/cobrancas', Session.verify, Payment.querystring); // listar cobranças
 router.put('/cobrancas', Session.verify, Payment.pagarBoleto); // pagar cobrança
 
 router.get('/relatorios', Session.verify, Payment.gerarRelatorio); // obter relatório

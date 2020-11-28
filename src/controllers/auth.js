@@ -4,6 +4,10 @@ const Password = require('../utils/password');
 const response = require('../utils/response');
 require('dotenv').config();
 
+/**
+ * Autentica o email e senha do usuário verificando o banco de dados
+ * e gera um token que expira em 1 hoda.
+ */
 const autenticar = async (ctx) => {
 	const { email = null, senha = null } = ctx.request.body;
 

@@ -6,10 +6,13 @@ const Codigo = require('../utils/code');
 const response = require('../utils/response');
 const { enviarEmail } = require('../utils/email');
 
+/**
+ * Gera e envia o boleto(por email) para o cliente selecionado.
+ */
 const criarBoleto = async (ctx) => {
 	const { idDoCliente, descricao, valor, vencimento } = ctx.request.body;
-	const vencimentoPadrao = Codigo.dataPadrao(vencimento)
-	console.log(vencimentoPadrao)
+	const vencimentoPadrao = Codigo.dataPadrao(vencimento);
+	console.log(vencimentoPadrao);
 	const { idUsuario } = ctx.state;
 	const result = await TabelaCliente.localizarIdCliente(
 		idDoCliente,
@@ -38,11 +41,16 @@ const criarBoleto = async (ctx) => {
 			transaction.tid
 		);
 		const vencimentoOrganizado = Codigo.organizarData(vencimento);
-		const valorOrganizado = Codigo.organizarValor(valor)
+		const valorOrganizado = Codigo.organizarValor(valor);
 		enviarEmail(
 			result.rows[0].email,
 			'Boleto gerado com sucesso!',
-			Codigo.htmlParaEmail(`${transaction.boleto_url}`, 'Pagar o boleto!', `Caso o link acima não funcione, favor realizar o pagamento utilizando o código de barras a seguir: ${transaction.boleto_barcode}`, `Olá ${nome}! Gostariamos de informar que ${ctx.state.nome} gerou para você um boleto no valor de R$ ${valorOrganizado} com vencimento: ${vencimentoOrganizado}.`)
+			Codigo.htmlParaEmail(
+				`${transaction.boleto_url}`,
+				'Pagar o boleto!',
+				`Caso o link acima não funcione, favor realizar o pagamento utilizando o código de barras a seguir: ${transaction.boleto_barcode}`,
+				`Olá ${nome}! Gostariamos de informar que ${ctx.state.nome} gerou para você um boleto no valor de R$ ${valorOrganizado} com vencimento: ${vencimentoOrganizado}.`
+			)
 		);
 		return response(ctx, 201, {
 			cobranca: {
@@ -58,6 +66,10 @@ const criarBoleto = async (ctx) => {
 	return response(ctx, 400, { mensagem: 'Mal formatado.' });
 };
 
+/**
+ * Listar os boletos gerado pelo usuário.
+ * retornando informações do status, valor, link e vencimento do boleto.
+ */
 const querystring = async (ctx) => {
 	const { offset, idDoCliente } = ctx.query;
 
@@ -82,6 +94,10 @@ const querystring = async (ctx) => {
 	return response(ctx, 200, { cobrancas: cobrancasAtualizadas });
 };
 
+/**
+ * Muda o status do boleto para "pago", passando o idDoBoleto no body.
+ * Caso o boleto informado já esteja pago ou vencido, será informado.
+ */
 const pagarBoleto = async (ctx) => {
 	const { idDaCobranca } = ctx.request.body;
 	const result = await TabelaPagamentos.buscarBoleto(idDaCobranca);
@@ -106,6 +122,10 @@ const pagarBoleto = async (ctx) => {
 	return response(ctx, 400, { mensagem: 'Mal formatado' });
 };
 
+/**
+ * Gera um relatório com informações sobre os clientes do usuário e os boletos gerados pelo usuário.
+ * retornando também todo o valor pago pelos cliente para o usuário.
+ */
 const gerarRelatorio = async (ctx) => {
 	const { idUsuario } = ctx.state;
 	const result = await TabelaPagamentos.relatorio(idUsuario);
