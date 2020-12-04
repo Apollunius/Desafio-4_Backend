@@ -95,6 +95,7 @@ const querystring = (clientes, boletos) => {
 			nome: cliente.nome,
 			id: cliente.id,
 			email: cliente.email,
+			tel: cliente.tel,
 			cobrancasFeitas,
 			cobrancasRecebidas,
 			estaInadimplente,
