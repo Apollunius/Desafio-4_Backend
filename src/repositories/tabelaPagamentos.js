@@ -31,8 +31,8 @@ const adicionarBoletoNaTabela = async (
 /**
  * Query que lista todos os boletos dos clientes do usuário.
  */
-const listarBoletos = async (offset, idDoCliente) => {
-	const query = `SELECT * FROM boletos WHERE idDoCliente = '${idDoCliente}' ORDER BY id ASC LIMIT 10 OFFSET ${offset}`;
+const listarBoletos = async (offset) => {
+	const query = `SELECT * FROM boletos ORDER BY id ASC LIMIT 10 OFFSET ${offset}`;
 	return database.query(query);
 };
 
