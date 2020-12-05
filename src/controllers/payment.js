@@ -12,7 +12,6 @@ const { enviarEmail } = require('../utils/email');
 const criarBoleto = async (ctx) => {
 	const { idDoCliente, descricao, valor, vencimento } = ctx.request.body;
 	const vencimentoPadrao = Codigo.dataPadrao(vencimento);
-	console.log(vencimentoPadrao);
 	const { idUsuario } = ctx.state;
 	const result = await TabelaCliente.localizarIdCliente(
 		idDoCliente,
@@ -71,9 +70,9 @@ const criarBoleto = async (ctx) => {
  * retornando informações do status, valor, link e vencimento do boleto.
  */
 const querystring = async (ctx) => {
-	const { offset, idDoCliente } = ctx.query;
+	const { offset } = ctx.query;
 
-	const result = await TabelaPagamentos.listarBoletos(offset, idDoCliente);
+	const result = await TabelaPagamentos.listarBoletos(offset);
 	const cobrancasAtualizadas = [];
 	result.rows.forEach((element, index) => {
 		const { transactionid, ...rest } = element;
@@ -90,8 +89,15 @@ const querystring = async (ctx) => {
 			TabelaPagamentos.boletoVencido(element.id);
 		}
 	});
+	const result2 = await TabelaPagamentos.buscarTodosOsBoletos();
+	const numeroDaPagina = offset / 10 + 1;
+	const totalBoletos = Math.ceil(result2.rows.length / 10);
 
-	return response(ctx, 200, { cobrancas: cobrancasAtualizadas });
+	return response(ctx, 200, {
+		paginaAtual: numeroDaPagina,
+		totalDePaginas: totalBoletos,
+		cobrancas: cobrancasAtualizadas,
+	});
 };
 
 /**
