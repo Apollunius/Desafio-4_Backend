@@ -93,6 +93,14 @@ const atualizarCliente = async (ctx) => {
 	return response(ctx, 406, { mensagem: 'CPF está inválido' });
 };
 
+const solicitarClientes = async (ctx) => {
+	console.log('oi');
+	const { idUsuario } = ctx.state;
+	console.log(idUsuario);
+	const dadosCliente = await TabelaClientes.localizarInfoClientes(idUsuario);
+	return response(ctx, 200, { dados: dadosCliente.rows });
+};
+
 /**
  * Buscar ou listar clientes do usuário.
  * caso não tenha nenhum conteúdo na busca, ele vai agir como listagem dos clientes.
@@ -136,4 +144,9 @@ const querystring = async (ctx) => {
 		clientes: dadosDePagamentoDoCliente,
 	});
 };
-module.exports = { adicionarCliente, atualizarCliente, querystring };
+module.exports = {
+	adicionarCliente,
+	atualizarCliente,
+	querystring,
+	solicitarClientes,
+};

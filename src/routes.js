@@ -13,6 +13,7 @@ router.post('/usuarios', Users.adicionarUsuario); // criar usuário
 router.post('/clientes', Session.verify, Clients.adicionarCliente); // criar clientes
 router.put('/clientes', Session.verify, Clients.atualizarCliente); // editar clientes
 router.get('/clientes', Session.verify, Clients.querystring); // listar clientes ou buscar cliente específico
+router.get('/clientes/dados', Session.verify, Clients.solicitarClientes);
 
 router.post('/cobrancas', Session.verify, Payment.criarBoleto); // criar cobranças
 router.get('/cobrancas', Session.verify, Payment.querystring); // listar cobranças

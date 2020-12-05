@@ -15,7 +15,10 @@ const localizarIdCliente = async (id, idUser) => {
 	const query = `SELECT * FROM clientes WHERE (id = '${id}' AND idUser = '${idUser}') ORDER BY id ASC`;
 	return database.query(query);
 };
-
+const localizarInfoClientes = async (idUser) => {
+	const query = `SELECT id, nome FROM clientes WHERE idUser = '${idUser}' ORDER BY id ASC`;
+	return database.query(query);
+};
 /**
  * Query para adicionar o cliente na tabela do banco de dados com as informações passadas pelo usuário.
  */
@@ -78,4 +81,5 @@ module.exports = {
 	listarClientesPorBusca,
 	listarTodosClientes,
 	listarTodosClientesPorBusca,
+	localizarInfoClientes,
 };
