@@ -94,7 +94,6 @@ const atualizarCliente = async (ctx) => {
 };
 
 const solicitarClientes = async (ctx) => {
-	console.log('oi');
 	const { idUsuario } = ctx.state;
 	console.log(idUsuario);
 	const dadosCliente = await TabelaClientes.localizarInfoClientes(idUsuario);
@@ -116,7 +115,7 @@ const querystring = async (ctx) => {
 			offset,
 			idUsuario
 		);
-		const boletos = await TabelaPagamentos.buscarTodosOsBoletos();
+		const boletos = await TabelaPagamentos.buscarTodosOsBoletos(idUsuario);
 		const result = await TabelaClientes.listarTodosClientesPorBusca(
 			busca,
 			idUsuario
@@ -132,7 +131,7 @@ const querystring = async (ctx) => {
 		});
 	}
 	const clientes = await TabelaClientes.listarClientes(offset, idUsuario);
-	const boletos = await TabelaPagamentos.buscarTodosOsBoletos();
+	const boletos = await TabelaPagamentos.buscarTodosOsBoletos(idUsuario);
 	const result = await TabelaClientes.listarTodosClientes(idUsuario);
 	const totalClientes = Math.ceil(result.rows.length / 10);
 	const numeroDaPagina = offset / 10 + 1;

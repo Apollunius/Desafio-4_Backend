@@ -22,6 +22,7 @@ const schema = {
 	3: `CREATE TABLE IF NOT EXISTS boletos (
 		id SERIAL PRIMARY KEY,
 		idDoCliente INT NOT NULL,
+		idUser INT NOT NULL,
 		descricao TEXT NOT NULL,
 		valor INT NOT NULL,
 		vencimento DATE NOT NULL,
@@ -59,6 +60,6 @@ const up = async (numeroSchema = null) => {
 
 // Comentar as funções que não irá usar.
 up();
-drop('usuarios');
-drop('clientes');
-drop('boletos');
+// drop('usuarios');
+// drop('clientes');
+// drop('boletos');

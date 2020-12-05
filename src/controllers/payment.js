@@ -37,7 +37,8 @@ const criarBoleto = async (ctx) => {
 			vencimentoPadrao,
 			transaction.boleto_url,
 			transaction.status,
-			transaction.tid
+			transaction.tid,
+			idUsuario
 		);
 		const vencimentoOrganizado = Codigo.organizarData(vencimento);
 		const valorOrganizado = Codigo.organizarValor(valor);
@@ -71,8 +72,9 @@ const criarBoleto = async (ctx) => {
  */
 const querystring = async (ctx) => {
 	const { offset } = ctx.query;
+	const { idUsuario } = ctx.state;
 
-	const result = await TabelaPagamentos.listarBoletos(offset);
+	const result = await TabelaPagamentos.listarBoletos(offset, idUsuario);
 	const cobrancasAtualizadas = [];
 	result.rows.forEach((element, index) => {
 		const { transactionid, ...rest } = element;
@@ -89,7 +91,7 @@ const querystring = async (ctx) => {
 			TabelaPagamentos.boletoVencido(element.id);
 		}
 	});
-	const result2 = await TabelaPagamentos.buscarTodosOsBoletos();
+	const result2 = await TabelaPagamentos.buscarTodosOsBoletos(idUsuario);
 	const numeroDaPagina = offset / 10 + 1;
 	const totalBoletos = Math.ceil(result2.rows.length / 10);
 
