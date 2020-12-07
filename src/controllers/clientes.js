@@ -94,9 +94,7 @@ const atualizarCliente = async (ctx) => {
 };
 
 const solicitarClientes = async (ctx) => {
-	console.log('oi');
 	const { idUsuario } = ctx.state;
-	console.log(idUsuario);
 	const dadosCliente = await TabelaClientes.localizarInfoClientes(idUsuario);
 	return response(ctx, 200, { dados: dadosCliente.rows });
 };
