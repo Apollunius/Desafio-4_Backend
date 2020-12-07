@@ -10,11 +10,12 @@ const adicionarBoletoNaTabela = async (
 	vencimento,
 	link,
 	status,
-	transactionId
+	transactionId, 
+	idUser
 ) => {
 	const query = {
-		text: `INSERT INTO boletos (idDoCliente, descricao, valor, vencimento, link, status, transactionId)
-	VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+		text: `INSERT INTO boletos (idDoCliente, descricao, valor, vencimento, link, status, transactionId, idUser)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
 		values: [
 			idDoCliente,
 			descricao,
@@ -23,6 +24,7 @@ const adicionarBoletoNaTabela = async (
 			link,
 			status,
 			transactionId,
+			idUser
 		],
 	};
 	return database.query(query);
@@ -31,8 +33,8 @@ const adicionarBoletoNaTabela = async (
 /**
  * Query que lista todos os boletos dos clientes do usuário.
  */
-const listarBoletos = async (offset) => {
-	const query = `SELECT * FROM boletos ORDER BY id ASC LIMIT 10 OFFSET ${offset}`;
+const listarBoletos = async (offset, idUser) => {
+	const query = `SELECT * FROM boletos WHERE idUser = '${idUser}' ORDER BY id ASC LIMIT 10 OFFSET ${offset}`;
 	return database.query(query);
 };
 
@@ -63,8 +65,8 @@ const buscarBoleto = async (idCobranca) => {
 /**
  * Query que retorna todos os boletos da tabela do banco de dados.
  */
-const buscarTodosOsBoletos = async () => {
-	const query = `SELECT * FROM boletos ORDER BY id ASC`;
+const buscarTodosOsBoletos = async (idUser) => {
+	const query = `SELECT * FROM boletos WHERE idUser = '${idUser}' ORDER BY id ASC`;
 	return database.query(query);
 };
 
