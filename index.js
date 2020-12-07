@@ -13,4 +13,4 @@ server.use(bodyparser());
 server.use(logger);
 server.use(router.routes());
 
-server.listen(PORT, () => console.log(`Running on ${PORT}`));
+server.listen(PORT, '0.0.0.0', null, () => console.log(`Running on ${PORT}`));
