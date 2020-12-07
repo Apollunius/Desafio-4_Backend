@@ -10,7 +10,7 @@ const adicionarBoletoNaTabela = async (
 	vencimento,
 	link,
 	status,
-	transactionId, 
+	transactionId,
 	idUser
 ) => {
 	const query = {
@@ -24,7 +24,7 @@ const adicionarBoletoNaTabela = async (
 			link,
 			status,
 			transactionId,
-			idUser
+			idUser,
 		],
 	};
 	return database.query(query);
